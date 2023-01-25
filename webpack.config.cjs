@@ -6,7 +6,7 @@ module.exports = {
   entry: '/src/index.js',
   output: {
     path: path.resolve(__dirname, './dist'),
-    filename: 'index.js'
+    filename: 'index.js',
   },
   module: {
     rules: [
@@ -14,25 +14,24 @@ module.exports = {
         test: /\.css$/,
         use: [
           'style-loader',
-          'css-loader'
-        ]
+          'css-loader',
+        ],
       },
       {
         test: /\.(scss)$/,
         use: [
           {
-            loader: 'style-loader'
+            loader: 'style-loader',
           },
           {
-            loader: 'css-loader'
+            loader: 'css-loader',
           },
-          
           {
-            loader: 'sass-loader'
-          }
-        ]
-      }
-    ]
+            loader: 'sass-loader',
+          },
+        ],
+      },
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({
