@@ -12,3 +12,7 @@ rules:
     - error
     - ignorePackages
     - js: always
+    - devDependencies: false
+    - optionalDependencies: false
+    - peerDependencies: false
+    
