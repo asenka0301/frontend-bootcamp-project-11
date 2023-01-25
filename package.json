@@ -16,5 +16,13 @@
     "url": "https://github.com/asenka0301/frontend-bootcamp-project-11/issues"
   },
   "type": "module",
-  "homepage": "https://github.com/asenka0301/frontend-bootcamp-project-11#readme"
+  "homepage": "https://github.com/asenka0301/frontend-bootcamp-project-11#readme",
+  "devDependencies": {
+    "eslint": "^8.32.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
 }
