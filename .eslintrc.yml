@@ -1,6 +1,6 @@
 env:
   node: true
-  es2021: true
+  browser: true
 extends: airbnb-base
 overrides: []
 parserOptions:
@@ -8,4 +8,5 @@ parserOptions:
   sourceType: module
 rules:
   no-console: 0
-  import/no-extraneous-dependencies: 0
+  no-param-reassign: 0
+  import/extensions: 0
