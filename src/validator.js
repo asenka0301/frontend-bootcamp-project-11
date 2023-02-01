@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import loader from './loader.js';
 
 export default (field, state) => {
   // описываю схему валидацию
@@ -25,6 +26,7 @@ export default (field, state) => {
       state.additionForm.currentUrl = data.url;
       state.additionForm.addedUrls = [...state.additionForm.addedUrls, data.url];
       state.additionForm.urlIsValid = true;
+      loader(state);
     })
     .catch((error) => {
       state.additionForm.urlIsValid = false;

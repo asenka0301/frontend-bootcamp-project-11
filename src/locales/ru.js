@@ -12,5 +12,7 @@ export default {
       invalidUrl: 'Ссылка должна быть валидным URL',
     },
     RSSLoaded: 'RSS успешно загужен',
+    feeds: 'Фиды',
+    posts: 'Посты',
   },
 };

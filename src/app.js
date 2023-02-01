@@ -9,34 +9,30 @@ export default () => {
       currentUrl: '',
       urlIsValid: false,
       addedUrls: [],
-      validationError: null,
+      validationError: '',
     },
+    feeds: [],
+    posts: [],
+    lng: 'ru',
   };
 
-  const form = document.querySelector('.rss-form');
-  const input = document.querySelector('#url-input');
-  const message = document.querySelector('.feedback');
-  const buttonRu = document.querySelector('.btn-group button:first-child');
-  const paragraph = document.querySelector('.lead');
-  const buttonEn = document.querySelector('.btn-group button:last-child');
-  const mainHeader = document.querySelector('h1');
-  const addButton = document.querySelector('button[type="submit"]');
-  const exampleParagraph = document.querySelector('p.example');
-  const inputLabel = document.querySelector('.form-floating label');
-  const footerText = document.querySelector('.footer-text');
-  const elements = { form, input, message };
+  const elements = {
+    form: document.querySelector('.rss-form'),
+    input: document.querySelector('#url-input'),
+    message: document.querySelector('.feedback'),
+    buttonRu: document.querySelector('.btn-group button:first-child'),
+    paragraph: document.querySelector('.lead'),
+    buttonEn: document.querySelector('.btn-group button:last-child'),
+    mainHeader: document.querySelector('h1'),
+    addButton: document.querySelector('button[type="submit"]'),
+    exampleParagraph: document.querySelector('p.example'),
+    inputLabel: document.querySelector('.form-floating label'),
+    footerText: document.querySelector('.footer-text'),
+    feeds: document.querySelector('.feeds'),
+    posts: document.querySelector('.posts'),
+  };
 
   const i18nextInstance = i18next.createInstance();
-
-  const render = (watchedState) => {
-    mainHeader.textContent = i18nextInstance.t('header');
-    paragraph.textContent = i18nextInstance.t('mainParagraph');
-    addButton.textContent = i18nextInstance.t('addButton');
-    exampleParagraph.textContent = i18nextInstance.t('exampleParagraph');
-    inputLabel.textContent = i18nextInstance.t('inputLabel');
-    footerText.textContent = i18nextInstance.t('footerText');
-    message.textContent = watchedState.additionForm.urlIsValid ? i18nextInstance.t('RSSLoaded') : i18nextInstance.t(`errors.${watchedState.additionForm.validationError}`);
-  };
 
   i18nextInstance.init({
     lng: 'ru',
@@ -45,27 +41,25 @@ export default () => {
   }).then(() => {
     const watchedState = watcher(state, elements, i18nextInstance);
 
-    buttonEn.addEventListener('click', () => {
+    elements.buttonEn.addEventListener('click', () => {
       i18nextInstance.changeLanguage('en');
-      render(watchedState);
-      buttonRu.classList.remove('btn-success');
-      buttonEn.classList.remove('btn-outline-success', 'text-dark');
-      buttonRu.classList.add('btn-outline-success', 'text-dark');
-      buttonEn.classList.add('btn-success');
-      console.log(watchedState);
+      watchedState.lng = 'en';
+      elements.buttonRu.classList.remove('btn-success');
+      elements.buttonEn.classList.remove('btn-outline-success', 'text-dark');
+      elements.buttonRu.classList.add('btn-outline-success', 'text-dark');
+      elements.buttonEn.classList.add('btn-success');
     });
 
-    buttonRu.addEventListener('click', () => {
+    elements.buttonRu.addEventListener('click', () => {
       i18nextInstance.changeLanguage('ru');
-      render(watchedState);
-      console.log(watchedState);
-      buttonEn.classList.remove('btn-success');
-      buttonRu.classList.add('btn-success');
-      buttonRu.classList.remove('btn-outline-success', 'text-dark');
-      buttonEn.classList.add('btn-outline-success', 'text-dark');
+      watchedState.lng = 'ru';
+      elements.buttonEn.classList.remove('btn-success');
+      elements.buttonRu.classList.add('btn-success');
+      elements.buttonRu.classList.remove('btn-outline-success', 'text-dark');
+      elements.buttonEn.classList.add('btn-outline-success', 'text-dark');
     });
-    console.log(state);
-    form.addEventListener('submit', (event) => {
+
+    elements.form.addEventListener('submit', (event) => {
       event.preventDefault();
       const formData = new FormData(event.target);
       const url = formData.get('url');

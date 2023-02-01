@@ -12,5 +12,7 @@ export default {
       invalidUrl: 'Link must be valid URL',
     },
     RSSLoaded: 'RSS uploaded successfully',
+    feeds: 'Feeds',
+    posts: 'Posts',
   },
 };
