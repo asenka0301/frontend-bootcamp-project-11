@@ -13,8 +13,8 @@ const getProxyUrl = (stateUrl) => {
 const getFeed = (content) => {
   const feed = {};
   feed.id = _.uniqueId();
-  feed.title = content.querySelector('title').textContent;
-  feed.description = content.querySelector('description').textContent;
+  feed.title = content.querySelector('channel > title').textContent;
+  feed.description = content.querySelector('channel > description').textContent;
   return feed;
 };
 
@@ -33,17 +33,23 @@ const getPosts = (content) => {
 
 export default (state) => {
   const proxyUrl = getProxyUrl(state.additionForm.currentUrl);
+  state.currentState = 'loading';
   axios.get(proxyUrl)
     .then((response) => {
+      console.log(response);
       const dataContent = parser(response.data.contents);
+      console.log(dataContent);
+      console.log(dataContent);
       const feed = getFeed(dataContent);
       const posts = getPosts(dataContent);
       posts.forEach((post) => {
         post.feedId = feed.id;
       });
-      state.feeds = [...state.feeds, feed];
-      state.posts = [...state.posts, ...posts];
+      state.feeds = [feed, ...state.feeds];
+      state.posts = [...posts, ...state.posts];
+      state.currentState = 'loaded';
     }).catch((error) => {
-      console.log(error);
+      state.error = error.message === 'parseError' ? 'parseError' : 'networkError';
+      state.currentState = 'parseOrNetworkError';
     });
 };

@@ -10,6 +10,8 @@ export default {
       filledField: 'Field must be filled!',
       existingUrls: 'This RSS already exists!',
       invalidUrl: 'Link must be valid URL',
+      parseError: 'Resource does not contain valid RSS',
+      networkError: 'Network error',
     },
     RSSLoaded: 'RSS uploaded successfully',
     feeds: 'Feeds',

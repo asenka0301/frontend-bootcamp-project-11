@@ -28,7 +28,11 @@ const renderFeed = (state, elements, i18nextInstance) => {
     ul.append(li);
   });
   card.append(ul);
-  (elements.feeds).append(card);
+  if (!elements.feeds.hasChildNodes()) {
+    (elements.feeds).prepend(card);
+  } else {
+    elements.feeds.replaceChildren(card);
+  }
 };
 
 const renderPosts = (state, elements, i18nextInstance) => {
@@ -66,7 +70,11 @@ const renderPosts = (state, elements, i18nextInstance) => {
     ul.append(li);
   });
   div.append(ul);
-  (elements.posts).append(div);
+  if (!elements.posts.hasChildNodes()) {
+    (elements.posts).prepend(div);
+  } else {
+    elements.posts.replaceChildren(div);
+  }
 };
 
 const languageChangeRender = (state, elements, i18nextInstance) => {
@@ -78,6 +86,8 @@ const languageChangeRender = (state, elements, i18nextInstance) => {
   elements.footerText.textContent = i18nextInstance.t('footerText');
   if (!state.additionForm.validationError && !state.additionForm.urlIsValid) {
     elements.message.textContent = '';
+  } else if (state.currentState === 'parseOrNetworkError') {
+    elements.message.textContent = i18nextInstance.t(`errors.${state.error}`);
   } else {
     elements.message.textContent = state.additionForm.urlIsValid ? i18nextInstance.t('RSSLoaded') : i18nextInstance.t(`errors.${state.additionForm.validationError}`);
   }
@@ -93,19 +103,30 @@ const watcher = (state, elements, i18nextInstance) => onChange(state, (path, val
     elements.message.classList.add('text-danger');
     elements.message.textContent = i18nextInstance.t(`errors.${value}`);
   }
-  if (path === 'additionForm.urlIsValid') {
-    elements.input.classList.remove('is-invalid');
-    elements.message.textContent = i18nextInstance.t('RSSLoaded');
-    elements.message.classList.remove('text-danger');
-    elements.message.classList.add('text-success');
-    elements.form.reset();
-    elements.form.focus();
-  }
-  if (path === 'feeds') {
-    renderFeed(state, elements, i18nextInstance);
-  }
-  if (path === 'posts') {
-    renderPosts(state, elements, i18nextInstance);
+  if (path === 'currentState') {
+    if (state.currentState === 'loading') {
+      elements.input.readOnly = true;
+      elements.addButton.disabled = true;
+    }
+    if (state.currentState === 'loaded') {
+      elements.input.readOnly = false;
+      elements.addButton.disabled = false;
+      elements.input.classList.remove('is-invalid');
+      elements.message.textContent = i18nextInstance.t('RSSLoaded');
+      elements.message.classList.remove('text-danger');
+      elements.message.classList.add('text-success');
+      renderFeed(state, elements, i18nextInstance);
+      renderPosts(state, elements, i18nextInstance);
+      elements.form.reset();
+      elements.form.focus();
+    }
+    if (state.currentState === 'parseOrNetworkError') {
+      elements.message.textContent = i18nextInstance.t(`errors.${state.error}`);
+      elements.message.classList.remove('text-success');
+      elements.message.classList.add('text-danger');
+      elements.input.readOnly = false;
+      elements.addButton.disabled = false;
+    }
   }
   if (path === 'lng') {
     languageChangeRender(state, elements, i18nextInstance);

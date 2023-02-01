@@ -14,6 +14,8 @@ export default () => {
     feeds: [],
     posts: [],
     lng: 'ru',
+    currentState: 'initial', // текущее состоние
+    error: '', // другие ошибки
   };
 
   const elements = {
