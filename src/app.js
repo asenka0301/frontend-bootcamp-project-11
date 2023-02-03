@@ -6,7 +6,7 @@ import resources from './locales/index.js';
 export default () => {
   const state = {
     additionForm: {
-      currentUrl: '',
+      // currentUrl: '',
       urlIsValid: false,
       addedUrls: [],
       validationError: '',
@@ -65,7 +65,8 @@ export default () => {
       event.preventDefault();
       const formData = new FormData(event.target);
       const url = formData.get('url');
-      validator({ url }, watchedState, i18nextInstance);
+      validator({ url }, watchedState);
     });
+    // setTimeout(() => { console.log('this is the first message'); }, 5000);
   });
 };

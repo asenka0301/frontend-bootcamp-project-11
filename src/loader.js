@@ -1,5 +1,6 @@
 import axios from 'axios';
 import _ from 'lodash';
+// import loader from 'sass-loader';
 import parser from './parser.js';
 
 const getProxyUrl = (stateUrl) => {
@@ -31,25 +32,32 @@ const getPosts = (content) => {
   return posts;
 };
 
-export default (state) => {
-  const proxyUrl = getProxyUrl(state.additionForm.currentUrl);
+const loadRSS = (url) => {
+  const proxyUrl = getProxyUrl(url);
+  return axios.get(proxyUrl);
+};
+
+const updatePosts = (state) => {
   state.currentState = 'loading';
-  axios.get(proxyUrl)
-    .then((response) => {
-      console.log(response);
+  const result = (state.additionForm.addedUrls)
+    .map((url) => loadRSS(url, state).then((response) => {
       const dataContent = parser(response.data.contents);
-      console.log(dataContent);
-      console.log(dataContent);
       const feed = getFeed(dataContent);
       const posts = getPosts(dataContent);
-      posts.forEach((post) => {
-        post.feedId = feed.id;
-      });
-      state.feeds = [feed, ...state.feeds];
-      state.posts = [...posts, ...state.posts];
-      state.currentState = 'loaded';
-    }).catch((error) => {
-      state.error = error.message === 'parseError' ? 'parseError' : 'networkError';
-      state.currentState = 'parseOrNetworkError';
-    });
+
+      const isFeedInState = (state.feeds).find((item) => item.description === feed.description);
+      if (!isFeedInState) {
+        state.feeds = [feed, ...state.feeds];
+      }
+      const isObjectTitlesEqual = ((obj1, obj2) => obj1.title === obj2.title);
+      const checkPosts = _.differenceWith(posts, state.posts, isObjectTitlesEqual);
+      state.posts = [...state.posts, ...checkPosts];
+    })
+      .catch((error) => {
+        state.error = error.message === 'parseError' ? 'parseError' : 'networkError';
+        state.currentState = 'parseOrNetworkError';
+      }));
+  Promise.all(result).then(() => { state.currentState = 'loaded'; });
 };
+
+export default updatePosts;

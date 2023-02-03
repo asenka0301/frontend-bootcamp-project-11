@@ -36,6 +36,7 @@ const renderFeed = (state, elements, i18nextInstance) => {
 };
 
 const renderPosts = (state, elements, i18nextInstance) => {
+  (elements.posts).innerHTML = ''; //
   const div = document.createElement('div');
   div.classList.add('card', 'border-0');
   const divCard = document.createElement('div');
@@ -70,11 +71,12 @@ const renderPosts = (state, elements, i18nextInstance) => {
     ul.append(li);
   });
   div.append(ul);
-  if (!elements.posts.hasChildNodes()) {
-    (elements.posts).prepend(div);
-  } else {
-    elements.posts.replaceChildren(div);
-  }
+  (elements.posts).append(div);
+  // if (!elements.posts.hasChildNodes()) {
+  //   (elements.posts).prepend(div);
+  // } else {
+  //   elements.posts.replaceChildren(div);
+  // }
 };
 
 const languageChangeRender = (state, elements, i18nextInstance) => {

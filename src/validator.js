@@ -1,5 +1,6 @@
 import * as yup from 'yup';
-import loader from './loader.js';
+import addFeedAndPosts from './loader.js';
+import updatePosts from './loader.js';
 
 export default (field, state) => {
   // описываю схему валидацию
@@ -23,10 +24,11 @@ export default (field, state) => {
   // получаю либо объект, прошедший валидацию, либо ошибки
   schema.validate(field, state)
     .then((data) => {
-      state.additionForm.currentUrl = data.url;
+      // state.additionForm.currentUrl = data.url;
       state.additionForm.addedUrls = [...state.additionForm.addedUrls, data.url];
       state.additionForm.urlIsValid = true;
-      loader(state);
+      updatePosts(state);
+      // addFeedAndPosts(data.url, state);
     })
     .catch((error) => {
       state.additionForm.urlIsValid = false;
