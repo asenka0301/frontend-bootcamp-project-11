@@ -16,9 +16,16 @@ export default () => {
     lng: 'ru',
     currentState: 'initial', // текущее состоние
     // error: '', // другие ошибки
+    uiState: {
+      selectedPostIds: {
+      },
+      selectedPostId: null,
+    },
   };
 
   const elements = {
+    body: document.querySelector('body'),
+    modal: document.querySelector('.modal'),
     form: document.querySelector('.rss-form'),
     input: document.querySelector('#url-input'),
     message: document.querySelector('.feedback'),
@@ -32,6 +39,7 @@ export default () => {
     footerText: document.querySelector('.footer-text'),
     feeds: document.querySelector('.feeds'),
     posts: document.querySelector('.posts'),
+    modals: document.querySelectorAll('button[data-bs-target]'),
   };
 
   const i18nextInstance = i18next.createInstance();
@@ -67,6 +75,13 @@ export default () => {
       const url = formData.get('url');
       validator({ url }, watchedState);
     });
-    // setTimeout(() => { console.log('this is the first message'); }, 5000);
+
+    elements.posts.addEventListener('click', (event) => {
+      const clickedButton = event.target;
+      const clickedPostId = clickedButton.getAttribute('data-id');
+      watchedState.uiState.selectedPostIds[clickedPostId] = true;
+      watchedState.uiState.selectedPostId = clickedPostId;
+      watchedState.uiState.selectedPostId = null;
+    });
   });
 };

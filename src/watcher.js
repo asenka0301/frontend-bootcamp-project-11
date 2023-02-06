@@ -1,4 +1,5 @@
 import onChange from 'on-change';
+import _ from 'lodash';
 
 const renderFeed = (state, elements, i18nextInstance) => {
   const card = document.createElement('div');
@@ -53,8 +54,13 @@ const renderPosts = (state, elements, i18nextInstance) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     const a = document.createElement('a');
-    a.classList.add('fw-bold');
     a.setAttribute('data-id', `${post.id}`);
+    if (state.uiState.selectedPostIds[post.id]) {
+      a.classList.add('fw-normal');
+      a.classList.add('link-secondary');
+    } else {
+      a.classList.add('fw-bold');
+    }
     a.setAttribute('href', `${post.link}`);
     a.setAttribute('rel', 'noopener noreferrer');
     a.setAttribute('target', '_blank');
@@ -99,8 +105,51 @@ const languageChangeRender = (state, elements, i18nextInstance) => {
   }
 };
 
+const renderModal = (state, elements) => {
+  if (state.uiState.selectedPostId) {
+    const visitedLink = (elements.posts).querySelector(`a[data-id="${state.uiState.selectedPostId}"]`);
+    if (state.uiState.selectedPostIds[state.uiState.selectedPostId]) {
+      visitedLink.classList.remove('fw-bold');
+      visitedLink.classList.add('fw-normal');
+      visitedLink.classList.add('link-secondary');
+    }
+    elements.body.classList.add('modal-open');
+    elements.body.setAttribute('style', 'overflow: hidden; padding-right: 17px');
+    elements.modal.classList.add('show');
+    elements.modal.setAttribute('style', 'display: block');
+    elements.modal.removeAttribute('aria-hidden');
+    elements.modal.setAttribute('aria-modal', 'true');
+    const header = elements.modal.querySelector('h5');
+    header.textContent = visitedLink.textContent;
+    const description = elements.modal.querySelector('.modal-body');
+    description.textContent = _.find(state.posts, { id: state.uiState.selectedPostId }).description;
+    const divModal = document.createElement('div');
+    divModal.classList.add('modal-backdrop', 'fade', 'show');
+    elements.body.append(divModal);
+    const closeModal = elements.modal.querySelectorAll('[data-bs-dismiss="modal"]');
+    const article = elements.modal.querySelector('.full-article');
+    const link = visitedLink.getAttribute('href');
+
+    article.addEventListener('click', () => {
+      article.setAttribute('href', `${link}`);
+      article.focus();
+    });
+
+    closeModal.forEach((button) => {
+      button.addEventListener('click', () => {
+        elements.body.classList.remove('modal-open');
+        elements.body.removeAttribute('style');
+        elements.modal.classList.remove('show');
+        elements.modal.removeAttribute('style');
+        elements.modal.setAttribute('aria-hidden', 'true');
+        elements.modal.removeAttribute('aria-modal');
+        divModal.remove();
+      });
+    });
+  }
+};
+
 const watcher = (state, elements, i18nextInstance) => onChange(state, (path, value) => {
-  console.log(path);
   if (path === 'additionForm.validationError') {
     elements.input.classList.add('is-invalid');
     elements.message.classList.add('text-danger');
@@ -140,6 +189,9 @@ const watcher = (state, elements, i18nextInstance) => onChange(state, (path, val
   }
   if (path === 'lng') {
     languageChangeRender(state, elements, i18nextInstance);
+  }
+  if (path === 'uiState.selectedPostId') {
+    renderModal(state, elements);
   }
 });
 

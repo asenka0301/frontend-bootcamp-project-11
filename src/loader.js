@@ -38,7 +38,6 @@ const loadRSS = (url) => {
 };
 
 const updatePosts = (state) => {
-  console.log('again');
   state.currentState = 'loading';
   const result = (state.additionForm.addedUrls)
     .map((url) => loadRSS(url, state)
@@ -56,43 +55,12 @@ const updatePosts = (state) => {
         state.currentState = 'loaded';
       })
       .catch((error) => {
-        console.log(error.message);
+        console.log(error);
         state.currentState = 'parseError';
         const { urlsLength } = state.additionForm.addedUrls.length;
         state.additionForm.addedUrls = (state.additionForm.addedUrls).splice(urlsLength, 1);
       }));
   Promise.all(result).then(() => setTimeout(() => updatePosts(state), 5000));
 };
-// const updatePosts = (state) => {
-//   state.currentState = 'loading';
-//   const result = (state.additionForm.addedUrls)
-//     .map((url) => loadRSS(url, state).then((response) => {
-//       const dataContent = parser(response.data.contents);
-//       const feed = getFeed(dataContent);
-//       const posts = getPosts(dataContent);
-//       const isFeedInState = (state.feeds).find((item) => item.description === feed.description);
-//       if (!isFeedInState) {
-//         state.feeds = [feed, ...state.feeds];
-//       }
-//       const isObjectTitlesEqual = ((obj1, obj2) => obj1.title === obj2.title);
-//       const checkPosts = _.differenceWith(posts, state.posts, isObjectTitlesEqual);
-//       state.posts = [...checkPosts, ...state.posts];
-//       // state.currentState = 'loaded';
-//     }));
-//       // .catch((error) => {
-//       //   state.error = error.message === 'parseError' ? 'parseError' : 'networkError';
-//       //   state.currentState = 'parseOrNetworkError';
-//       //   // const { urlsLength } = state.additionForm.addedUrls.length;
-//       // }));
-//   Promise.all(result).then(() => {
-//     state.error = '';
-//     state.currentState = 'loaded';
-//   }).catch((error) => {
-//     state.error = error.message === 'parseError' ? 'parseError' : 'networkError';
-//     state.currentState = 'parseOrNetworkError';
-//     const { urlsLength } = state.additionForm.addedUrls.length;
-//     state.additionForm.addedUrls = (state.additionForm.addedUrls).splice(urlsLength, 1);
-//   });
-// };
 
 export default updatePosts;
