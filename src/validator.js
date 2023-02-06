@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-import addFeedAndPosts from './loader.js';
 import updatePosts from './loader.js';
 
 export default (field, state) => {

@@ -100,6 +100,7 @@ const languageChangeRender = (state, elements, i18nextInstance) => {
 };
 
 const watcher = (state, elements, i18nextInstance) => onChange(state, (path, value) => {
+  console.log(path);
   if (path === 'additionForm.validationError') {
     elements.input.classList.add('is-invalid');
     elements.message.classList.add('text-danger');
@@ -109,6 +110,7 @@ const watcher = (state, elements, i18nextInstance) => onChange(state, (path, val
     if (state.currentState === 'loading') {
       elements.input.readOnly = true;
       elements.addButton.disabled = true;
+      elements.message.textContent = '';
     }
     if (state.currentState === 'loaded') {
       elements.input.readOnly = false;
@@ -117,18 +119,24 @@ const watcher = (state, elements, i18nextInstance) => onChange(state, (path, val
       elements.message.textContent = i18nextInstance.t('RSSLoaded');
       elements.message.classList.remove('text-danger');
       elements.message.classList.add('text-success');
-      renderFeed(state, elements, i18nextInstance);
-      renderPosts(state, elements, i18nextInstance);
+      // renderFeed(state, elements, i18nextInstance);
+      // renderPosts(state, elements, i18nextInstance);
       elements.form.reset();
       elements.form.focus();
     }
-    if (state.currentState === 'parseOrNetworkError') {
-      elements.message.textContent = i18nextInstance.t(`errors.${state.error}`);
+    if (state.currentState === 'parseError') {
+      elements.message.textContent = 'parse Error';
       elements.message.classList.remove('text-success');
       elements.message.classList.add('text-danger');
       elements.input.readOnly = false;
       elements.addButton.disabled = false;
     }
+  }
+  if (path === 'posts') {
+    renderPosts(state, elements, i18nextInstance);
+  }
+  if (path === 'feeds') {
+    renderFeed(state, elements, i18nextInstance);
   }
   if (path === 'lng') {
     languageChangeRender(state, elements, i18nextInstance);
