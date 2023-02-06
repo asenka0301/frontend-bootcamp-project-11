@@ -78,14 +78,11 @@ const updatePosts = (state) => {
 //       const checkPosts = _.differenceWith(posts, state.posts, isObjectTitlesEqual);
 //       state.posts = [...checkPosts, ...state.posts];
 //       // state.currentState = 'loaded';
-      
 //     }));
 //       // .catch((error) => {
 //       //   state.error = error.message === 'parseError' ? 'parseError' : 'networkError';
 //       //   state.currentState = 'parseOrNetworkError';
 //       //   // const { urlsLength } = state.additionForm.addedUrls.length;
-//       //   // state.additionForm.addedUrls = (state.additionForm.addedUrls).splice(urlsLength, 1);
-//       //   console.log(error);
 //       // }));
 //   Promise.all(result).then(() => {
 //     state.error = '';
