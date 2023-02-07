@@ -40,7 +40,6 @@ const addFeedAndPosts = (url, state) => {
   state.currentState = 'loading';
   loadRSS(url).then((response) => {
     const dataContent = parser(response.data.contents);
-    console.log(dataContent);
     const feed = getFeed(dataContent);
     const posts = getPosts(dataContent);
     state.feeds = [feed, ...state.feeds];

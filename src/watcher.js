@@ -97,9 +97,10 @@ const languageChangeRender = (state, elements, i18nextInstance) => {
   }
 };
 
-const renderModal = (state, elements) => {
+const showModal = (state, elements) => {
   if (state.uiState.selectedPostId) {
     const visitedLink = (elements.posts).querySelector(`a[data-id="${state.uiState.selectedPostId}"]`);
+    const relatedPost = _.find(state.posts, { id: state.uiState.selectedPostId });
     if (state.uiState.selectedPostIds[state.uiState.selectedPostId]) {
       visitedLink.classList.remove('fw-bold');
       visitedLink.classList.add('fw-normal');
@@ -112,31 +113,38 @@ const renderModal = (state, elements) => {
     elements.modal.removeAttribute('aria-hidden');
     elements.modal.setAttribute('aria-modal', 'true');
     const header = elements.modal.querySelector('h5');
-    header.textContent = visitedLink.textContent;
+    header.textContent = relatedPost.title;
     const description = elements.modal.querySelector('.modal-body');
-    description.textContent = _.find(state.posts, { id: state.uiState.selectedPostId }).description;
+    description.textContent = relatedPost.description;
     const divModal = document.createElement('div');
     divModal.classList.add('modal-backdrop', 'fade', 'show');
     elements.body.append(divModal);
-    const closeModal = elements.modal.querySelectorAll('[data-bs-dismiss="modal"]');
+    const closeModalButton = elements.modal.querySelectorAll('[data-bs-dismiss="modal"]');
     const article = elements.modal.querySelector('.full-article');
-    const link = visitedLink.getAttribute('href');
 
     article.addEventListener('click', () => {
-      article.setAttribute('href', `${link}`);
-      article.focus();
+      article.setAttribute('href', `${relatedPost.link}`);
     });
 
-    closeModal.forEach((button) => {
+    const closeModal = () => {
+      elements.body.classList.remove('modal-open');
+      elements.body.removeAttribute('style');
+      elements.modal.classList.remove('show');
+      elements.modal.removeAttribute('style');
+      elements.modal.setAttribute('aria-hidden', 'true');
+      elements.modal.removeAttribute('aria-modal');
+      divModal.remove();
+    };
+
+    closeModalButton.forEach((button) => {
       button.addEventListener('click', () => {
-        elements.body.classList.remove('modal-open');
-        elements.body.removeAttribute('style');
-        elements.modal.classList.remove('show');
-        elements.modal.removeAttribute('style');
-        elements.modal.setAttribute('aria-hidden', 'true');
-        elements.modal.removeAttribute('aria-modal');
-        divModal.remove();
+        closeModal();
       });
+    });
+    elements.body.addEventListener('click', (event) => {
+      if (event.target === elements.modal) {
+        closeModal();
+      }
     });
   }
 };
@@ -181,7 +189,7 @@ const watcher = (state, elements, i18nextInstance) => onChange(state, (path, val
     languageChangeRender(state, elements, i18nextInstance);
   }
   if (path === 'uiState.selectedPostId') {
-    renderModal(state, elements);
+    showModal(state, elements);
   }
 });
 
