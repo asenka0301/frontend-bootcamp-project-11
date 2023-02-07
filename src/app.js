@@ -2,6 +2,7 @@ import i18next from 'i18next';
 import validator from './validator.js';
 import watcher from './watcher.js';
 import resources from './locales/index.js';
+import { updatePosts } from './loader.js';
 
 export default () => {
   const state = {
@@ -83,5 +84,7 @@ export default () => {
       watchedState.uiState.selectedPostId = clickedPostId;
       watchedState.uiState.selectedPostId = null;
     });
+
+    updatePosts(watchedState);
   });
 };

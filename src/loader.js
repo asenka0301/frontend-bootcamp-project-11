@@ -1,6 +1,5 @@
 import axios from 'axios';
 import _ from 'lodash';
-// import loader from 'sass-loader';
 import parser from './parser.js';
 
 const getProxyUrl = (stateUrl) => {
@@ -34,33 +33,35 @@ const getPosts = (content) => {
 
 const loadRSS = (url) => {
   const proxyUrl = getProxyUrl(url);
-  return axios.get(proxyUrl);
+  return axios.get(proxyUrl, { timeout: 5000 });
 };
 
-const updatePosts = (state) => {
+const addFeedAndPosts = (url, state) => {
   state.currentState = 'loading';
+  loadRSS(url).then((response) => {
+    const dataContent = parser(response.data.contents);
+    const feed = getFeed(dataContent);
+    const posts = getPosts(dataContent);
+    state.feeds = [feed, ...state.feeds];
+    state.posts = [...posts, ...state.posts];
+    state.additionForm.addedUrls = [...state.additionForm.addedUrls, url];
+    state.currentState = 'loaded';
+  }).catch((error) => {
+    state.currentState = error.message === 'parseError' ? 'parseError' : 'networkError';
+  });
+};
+
+export const updatePosts = (state) => {
   const result = (state.additionForm.addedUrls)
     .map((url) => loadRSS(url, state)
       .then((response) => {
         const dataContent = parser(response.data.contents);
-        const feed = getFeed(dataContent);
         const posts = getPosts(dataContent);
-        const isFeedInState = (state.feeds).find((item) => item.description === feed.description);
-        if (!isFeedInState) {
-          state.feeds = [feed, ...state.feeds];
-        }
         const isObjectTitlesEqual = ((obj1, obj2) => obj1.title === obj2.title);
         const checkPosts = _.differenceWith(posts, state.posts, isObjectTitlesEqual);
         state.posts = [...checkPosts, ...state.posts];
-        state.currentState = 'loaded';
-      })
-      .catch((error) => {
-        console.log(error);
-        state.currentState = 'parseError';
-        const { urlsLength } = state.additionForm.addedUrls.length;
-        state.additionForm.addedUrls = (state.additionForm.addedUrls).splice(urlsLength, 1);
       }));
   Promise.all(result).then(() => setTimeout(() => updatePosts(state), 5000));
 };
 
-export default updatePosts;
+export default addFeedAndPosts;

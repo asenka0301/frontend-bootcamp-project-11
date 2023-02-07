@@ -1,5 +1,7 @@
+// import { render } from 'sass';
 import * as yup from 'yup';
-import updatePosts from './loader.js';
+import addPostsAndFeeds from './loader.js';
+// import updatePosts from './loader.js';
 
 export default (field, state) => {
   // описываю схему валидацию
@@ -24,9 +26,10 @@ export default (field, state) => {
   schema.validate(field, state)
     .then((data) => {
       // state.additionForm.currentUrl = data.url;
-      state.additionForm.addedUrls = [...state.additionForm.addedUrls, data.url];
+      // state.additionForm.addedUrls = [...state.additionForm.addedUrls, data.url];
       state.additionForm.urlIsValid = true;
-      updatePosts(state);
+      addPostsAndFeeds(data.url, state);
+      // updatePosts(state);
       // addFeedAndPosts(data.url, state);
     })
     .catch((error) => {
