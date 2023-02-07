@@ -7,7 +7,6 @@ import { updatePosts } from './loader.js';
 export default () => {
   const state = {
     additionForm: {
-      // currentUrl: '',
       urlIsValid: false,
       addedUrls: [],
       validationError: '',
@@ -16,10 +15,8 @@ export default () => {
     posts: [],
     lng: 'ru',
     currentState: 'initial', // текущее состоние
-    // error: '', // другие ошибки
     uiState: {
-      selectedPostIds: {
-      },
+      selectedPostIds: {},
       selectedPostId: null,
     },
   };
@@ -30,9 +27,10 @@ export default () => {
     form: document.querySelector('.rss-form'),
     input: document.querySelector('#url-input'),
     message: document.querySelector('.feedback'),
-    buttonRu: document.querySelector('.btn-group button:first-child'),
     paragraph: document.querySelector('.lead'),
-    buttonEn: document.querySelector('.btn-group button:last-child'),
+    langButtons: document.querySelector('#langButtons'),
+    buttonEn: document.querySelector('#en'),
+    buttonRu: document.querySelector('#ru'),
     mainHeader: document.querySelector('h1'),
     addButton: document.querySelector('button[type="submit"]'),
     exampleParagraph: document.querySelector('p.example'),
@@ -52,22 +50,16 @@ export default () => {
   }).then(() => {
     const watchedState = watcher(state, elements, i18nextInstance);
 
-    elements.buttonEn.addEventListener('click', () => {
-      i18nextInstance.changeLanguage('en');
-      watchedState.lng = 'en';
-      elements.buttonRu.classList.remove('btn-success');
-      elements.buttonEn.classList.remove('btn-outline-success', 'text-dark');
-      elements.buttonRu.classList.add('btn-outline-success', 'text-dark');
-      elements.buttonEn.classList.add('btn-success');
-    });
-
-    elements.buttonRu.addEventListener('click', () => {
-      i18nextInstance.changeLanguage('ru');
-      watchedState.lng = 'ru';
-      elements.buttonEn.classList.remove('btn-success');
-      elements.buttonRu.classList.add('btn-success');
-      elements.buttonRu.classList.remove('btn-outline-success', 'text-dark');
-      elements.buttonEn.classList.add('btn-outline-success', 'text-dark');
+    elements.langButtons.addEventListener('click', (event) => {
+      const buttonId = event.target.getAttribute('id');
+      i18nextInstance.changeLanguage(buttonId);
+      watchedState.lng = buttonId;
+      const primaryButton = buttonId === 'ru' ? elements.buttonRu : elements.buttonEn;
+      const outlineButton = buttonId === 'ru' ? elements.buttonEn : elements.buttonRu;
+      outlineButton.classList.remove('btn-success');
+      outlineButton.classList.add('btn-outline-success', 'text-dark');
+      primaryButton.classList.remove('btn-outline-success', 'text-dark');
+      primaryButton.classList.add('btn-success');
     });
 
     elements.form.addEventListener('submit', (event) => {

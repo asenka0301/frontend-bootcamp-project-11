@@ -2,15 +2,16 @@ import onChange from 'on-change';
 import _ from 'lodash';
 
 const renderFeed = (state, elements, i18nextInstance) => {
-  const card = document.createElement('div');
-  card.classList.add('card', 'border-0');
+  (elements.feeds).innerHTML = '';
+  const div = document.createElement('div');
+  div.classList.add('card', 'border-0');
   const cardBody = document.createElement('div');
   cardBody.classList.add('card-body');
   const h2 = document.createElement('h2');
   h2.classList.add('card-title', 'h4', 'feeds-heading');
   h2.textContent = i18nextInstance.t('feeds');
   cardBody.append(h2);
-  card.append(cardBody);
+  div.append(cardBody);
 
   const ul = document.createElement('ul');
   ul.classList.add('list-group', 'border-0', 'rounded-0');
@@ -28,16 +29,12 @@ const renderFeed = (state, elements, i18nextInstance) => {
     li.append(p);
     ul.append(li);
   });
-  card.append(ul);
-  if (!elements.feeds.hasChildNodes()) {
-    (elements.feeds).prepend(card);
-  } else {
-    elements.feeds.replaceChildren(card);
-  }
+  div.append(ul);
+  (elements.feeds).append(div);
 };
 
 const renderPosts = (state, elements, i18nextInstance) => {
-  (elements.posts).innerHTML = ''; //
+  (elements.posts).innerHTML = '';
   const div = document.createElement('div');
   div.classList.add('card', 'border-0');
   const divCard = document.createElement('div');
@@ -78,11 +75,6 @@ const renderPosts = (state, elements, i18nextInstance) => {
   });
   div.append(ul);
   (elements.posts).append(div);
-  // if (!elements.posts.hasChildNodes()) {
-  //   (elements.posts).prepend(div);
-  // } else {
-  //   elements.posts.replaceChildren(div);
-  // }
 };
 
 const languageChangeRender = (state, elements, i18nextInstance) => {
