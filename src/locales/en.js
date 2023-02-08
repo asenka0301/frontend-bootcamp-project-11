@@ -16,5 +16,6 @@ export default {
     RSSLoaded: 'RSS uploaded successfully',
     feeds: 'Feeds',
     posts: 'Posts',
+    review: 'Review',
   },
 };

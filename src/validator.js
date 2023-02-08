@@ -16,15 +16,15 @@ export default (field, state) => {
       .string()
       .required()
       .url()
-      .notOneOf(state.additionForm.addedUrls),
+      .notOneOf(state.addedUrls),
   });
   schema.validate(field, state)
     .then((data) => {
-      state.additionForm.validationError = '';
+      state.currentState = '';
       addPostsAndFeeds(data.url, state);
     })
     .catch((error) => {
       // state.additionForm.urlIsValid = false;
-      state.additionForm.validationError = error.message;
+      state.currentState = error.message;
     });
 };

@@ -44,7 +44,7 @@ const addFeedAndPosts = (url, state) => {
     const posts = getPosts(dataContent);
     state.feeds = [feed, ...state.feeds];
     state.posts = [...posts, ...state.posts];
-    state.additionForm.addedUrls = [...state.additionForm.addedUrls, url];
+    state.addedUrls = [...state.addedUrls, url];
     state.currentState = 'loaded';
   }).catch((error) => {
     state.currentState = error.message === 'parseError' ? 'parseError' : 'networkError';
@@ -52,7 +52,7 @@ const addFeedAndPosts = (url, state) => {
 };
 
 export const updatePosts = (state) => {
-  const result = (state.additionForm.addedUrls)
+  const result = (state.addedUrls)
     .map((url) => loadRSS(url, state)
       .then((response) => {
         const dataContent = parser(response.data.contents);

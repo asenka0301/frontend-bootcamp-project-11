@@ -1,6 +1,8 @@
 import onChange from 'on-change';
 import _ from 'lodash';
 
+const possibleErrorMessages = ['parseError', 'networkError', 'invalidUrl', 'existingUrls', 'filledField'];
+
 const renderFeed = (state, elements, i18nextInstance) => {
   (elements.feeds).innerHTML = '';
   const div = document.createElement('div');
@@ -69,7 +71,8 @@ const renderPosts = (state, elements, i18nextInstance) => {
     button.setAttribute('type', 'button');
     button.setAttribute('data-bs-toggle', 'modal');
     button.setAttribute('data-bs-target', '#modal');
-    button.textContent = 'Просмотр';
+    button.setAttribute('id', 'view');
+    button.textContent = i18nextInstance.t('review');
     li.append(button);
     ul.append(li);
   });
@@ -77,29 +80,37 @@ const renderPosts = (state, elements, i18nextInstance) => {
   (elements.posts).append(div);
 };
 
-const languageChangeRender = (state, elements, i18nextInstance) => {
+const translatePageContent = (elements, i18nextInstance) => {
   elements.mainHeader.textContent = i18nextInstance.t('header');
   elements.paragraph.textContent = i18nextInstance.t('mainParagraph');
   elements.addButton.textContent = i18nextInstance.t('addButton');
   elements.exampleParagraph.textContent = i18nextInstance.t('exampleParagraph');
   elements.inputLabel.textContent = i18nextInstance.t('inputLabel');
   elements.footerText.textContent = i18nextInstance.t('footerText');
-  if (!state.additionForm.validationError) {
-    elements.message.textContent = '';
-  } else if ((state.currentState === 'parseError') || (state.currentState === 'networkError')) {
-    elements.message.textContent = i18nextInstance.t(`errors.${state.currentState}`);
-  } else {
-    elements.message.textContent = !state.additionForm.validationError ? i18nextInstance.t('RSSLoaded') : i18nextInstance.t(`errors.${state.additionForm.validationError}`);
-  }
-  if (document.querySelector('.feeds-heading') && document.querySelector('.posts-heading')) {
+  if (document.querySelector('.feeds-heading')) {
     document.querySelector('.feeds-heading').textContent = i18nextInstance.t('feeds');
     document.querySelector('.posts-heading').textContent = i18nextInstance.t('posts');
+    document.querySelectorAll('#view').textContent = i18nextInstance.t('review');
   }
 };
 
+const translateOutputMessage = (state, elements, i18nextInstance) => {
+  if (!state.currentState) {
+    elements.message.textContent = '';
+  } else if (possibleErrorMessages.includes(state.currentState)) {
+    elements.message.textContent = i18nextInstance.t(`errors.${state.currentState}`);
+  } else {
+    elements.message.textContent = i18nextInstance.t('RSSLoaded');
+  }
+};
+
+const languageChangeRender = (state, elements, i18nextInstance) => {
+  translatePageContent(elements, i18nextInstance);
+  translateOutputMessage(state, elements, i18nextInstance);
+};
+
 const showModal = (state, elements) => {
-  // if (state.uiState.selectedPostId) {
-  if (state.uiState.watchedBy) {
+  if (state.uiState.clickedBy) {
     const visitedLink = (elements.posts).querySelector(`a[data-id="${state.uiState.selectedPostId}"]`);
     const relatedPost = _.find(state.posts, { id: state.uiState.selectedPostId });
     if (state.uiState.selectedPostIds[state.uiState.selectedPostId]) {
@@ -107,7 +118,7 @@ const showModal = (state, elements) => {
       visitedLink.classList.add('fw-normal');
       visitedLink.classList.add('link-secondary');
     }
-    if (state.uiState.watchedBy === 'BUTTON') {
+    if (state.uiState.clickedBy === 'BUTTON') {
       elements.body.classList.add('modal-open');
       elements.body.setAttribute('style', 'overflow: hidden; padding-right: 17px');
       elements.modal.classList.add('show');
@@ -152,12 +163,7 @@ const showModal = (state, elements) => {
   }
 };
 
-const watcher = (state, elements, i18nextInstance) => onChange(state, (path, value) => {
-  if (path === 'additionForm.validationError') {
-    elements.input.classList.add('is-invalid');
-    elements.message.classList.add('text-danger');
-    elements.message.textContent = i18nextInstance.t(`errors.${value}`);
-  }
+const watcher = (state, elements, i18nextInstance) => onChange(state, (path) => {
   if (path === 'currentState') {
     if (state.currentState === 'loading') {
       elements.input.readOnly = true;
@@ -174,7 +180,7 @@ const watcher = (state, elements, i18nextInstance) => onChange(state, (path, val
       elements.form.reset();
       elements.form.focus();
     }
-    if ((state.currentState === 'parseError') || (state.currentState === 'networkError')) {
+    if (possibleErrorMessages.includes(state.currentState)) {
       elements.message.textContent = i18nextInstance.t(`errors.${state.currentState}`);
       elements.message.classList.remove('text-success');
       elements.message.classList.add('text-danger');
@@ -189,9 +195,11 @@ const watcher = (state, elements, i18nextInstance) => onChange(state, (path, val
     renderFeed(state, elements, i18nextInstance);
   }
   if (path === 'lng') {
+    console.log(state);
     languageChangeRender(state, elements, i18nextInstance);
+    renderPosts(state, elements, i18nextInstance);
   }
-  if (path === 'uiState.watchedBy') {
+  if (path === 'uiState.clickedBy') {
     showModal(state, elements);
   }
 });

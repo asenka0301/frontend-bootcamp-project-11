@@ -16,5 +16,6 @@ export default {
     RSSLoaded: 'RSS успешно загружен',
     feeds: 'Фиды',
     posts: 'Посты',
+    review: 'Просмотр',
   },
 };

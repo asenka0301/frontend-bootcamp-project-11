@@ -6,19 +6,20 @@ import { updatePosts } from './loader.js';
 
 export default () => {
   const state = {
-    additionForm: {
-      // urlIsValid: false,
-      addedUrls: [],
-      validationError: '',
-    },
+    // additionForm: {
+    //   // urlIsValid: false,
+    //   addedUrls: [],
+    //   validationError: '',
+    // },
+    addedUrls: [],
     feeds: [],
     posts: [],
     lng: 'ru',
-    currentState: 'initial', // текущее состоние
+    currentState: '', // текущее состоние
     uiState: {
       selectedPostIds: {},
       selectedPostId: null,
-      watchedBy: null,
+      clickedBy: null,
     },
   };
 
@@ -40,7 +41,6 @@ export default () => {
     feeds: document.querySelector('.feeds'),
     posts: document.querySelector('.posts'),
     modals: document.querySelectorAll('button[data-bs-target]'),
-    // buttons: document.querySelectorAll('.btn-sm')
   };
 
   const i18nextInstance = i18next.createInstance();
@@ -73,13 +73,11 @@ export default () => {
 
     elements.posts.addEventListener('click', (event) => {
       const clickedButton = event.target;
-      console.log(clickedButton.tagName);
       const clickedPostId = clickedButton.getAttribute('data-id');
       watchedState.uiState.selectedPostIds[clickedPostId] = true;
       watchedState.uiState.selectedPostId = clickedPostId;
-      watchedState.uiState.watchedBy = clickedButton.tagName;
-      watchedState.uiState.watchedBy = null;
-      // watchedState.uiState.selectedPostId = null;
+      watchedState.uiState.clickedBy = clickedButton.tagName;
+      watchedState.uiState.clickedBy = null;
     });
 
     updatePosts(watchedState);
