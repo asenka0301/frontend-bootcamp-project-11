@@ -7,7 +7,7 @@
 In this project we create RSS aggregator. RSS is a specialized format designed to describe news feeds, article announcements and other materials. This is the easiest way for websites (usually blogs) to allow users to subscribe to changes. For this, special services called RSS aggregators are used. These services are able to poll the RSS feeds of sites for new posts and display them in a convenient way, marking what they have read and so on.
 ## Setup
 ```sh
-$ https://github.com/asenka0301/frontend-bootcamp-project-46.git
+$ https://github.com/asenka0301/frontend-bootcamp-project-11.git
 $ make install
 $ make build
 ```
