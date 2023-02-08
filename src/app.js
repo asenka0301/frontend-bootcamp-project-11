@@ -7,7 +7,7 @@ import { updatePosts } from './loader.js';
 export default () => {
   const state = {
     additionForm: {
-      urlIsValid: false,
+      // urlIsValid: false,
       addedUrls: [],
       validationError: '',
     },
@@ -18,6 +18,7 @@ export default () => {
     uiState: {
       selectedPostIds: {},
       selectedPostId: null,
+      watchedBy: null,
     },
   };
 
@@ -39,6 +40,7 @@ export default () => {
     feeds: document.querySelector('.feeds'),
     posts: document.querySelector('.posts'),
     modals: document.querySelectorAll('button[data-bs-target]'),
+    // buttons: document.querySelectorAll('.btn-sm')
   };
 
   const i18nextInstance = i18next.createInstance();
@@ -71,10 +73,13 @@ export default () => {
 
     elements.posts.addEventListener('click', (event) => {
       const clickedButton = event.target;
+      console.log(clickedButton.tagName);
       const clickedPostId = clickedButton.getAttribute('data-id');
       watchedState.uiState.selectedPostIds[clickedPostId] = true;
       watchedState.uiState.selectedPostId = clickedPostId;
-      watchedState.uiState.selectedPostId = null;
+      watchedState.uiState.watchedBy = clickedButton.tagName;
+      watchedState.uiState.watchedBy = null;
+      // watchedState.uiState.selectedPostId = null;
     });
 
     updatePosts(watchedState);

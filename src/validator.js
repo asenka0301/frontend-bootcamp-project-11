@@ -20,11 +20,11 @@ export default (field, state) => {
   });
   schema.validate(field, state)
     .then((data) => {
-      state.additionForm.urlIsValid = true;
+      state.additionForm.validationError = '';
       addPostsAndFeeds(data.url, state);
     })
     .catch((error) => {
-      state.additionForm.urlIsValid = false;
+      // state.additionForm.urlIsValid = false;
       state.additionForm.validationError = error.message;
     });
 };

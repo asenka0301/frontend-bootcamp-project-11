@@ -84,12 +84,12 @@ const languageChangeRender = (state, elements, i18nextInstance) => {
   elements.exampleParagraph.textContent = i18nextInstance.t('exampleParagraph');
   elements.inputLabel.textContent = i18nextInstance.t('inputLabel');
   elements.footerText.textContent = i18nextInstance.t('footerText');
-  if (!state.additionForm.validationError && !state.additionForm.urlIsValid) {
+  if (!state.additionForm.validationError) {
     elements.message.textContent = '';
   } else if ((state.currentState === 'parseError') || (state.currentState === 'networkError')) {
     elements.message.textContent = i18nextInstance.t(`errors.${state.currentState}`);
   } else {
-    elements.message.textContent = state.additionForm.urlIsValid ? i18nextInstance.t('RSSLoaded') : i18nextInstance.t(`errors.${state.additionForm.validationError}`);
+    elements.message.textContent = !state.additionForm.validationError ? i18nextInstance.t('RSSLoaded') : i18nextInstance.t(`errors.${state.additionForm.validationError}`);
   }
   if (document.querySelector('.feeds-heading') && document.querySelector('.posts-heading')) {
     document.querySelector('.feeds-heading').textContent = i18nextInstance.t('feeds');
@@ -98,7 +98,8 @@ const languageChangeRender = (state, elements, i18nextInstance) => {
 };
 
 const showModal = (state, elements) => {
-  if (state.uiState.selectedPostId) {
+  // if (state.uiState.selectedPostId) {
+  if (state.uiState.watchedBy) {
     const visitedLink = (elements.posts).querySelector(`a[data-id="${state.uiState.selectedPostId}"]`);
     const relatedPost = _.find(state.posts, { id: state.uiState.selectedPostId });
     if (state.uiState.selectedPostIds[state.uiState.selectedPostId]) {
@@ -106,46 +107,48 @@ const showModal = (state, elements) => {
       visitedLink.classList.add('fw-normal');
       visitedLink.classList.add('link-secondary');
     }
-    elements.body.classList.add('modal-open');
-    elements.body.setAttribute('style', 'overflow: hidden; padding-right: 17px');
-    elements.modal.classList.add('show');
-    elements.modal.setAttribute('style', 'display: block');
-    elements.modal.removeAttribute('aria-hidden');
-    elements.modal.setAttribute('aria-modal', 'true');
-    const header = elements.modal.querySelector('h5');
-    header.textContent = relatedPost.title;
-    const description = elements.modal.querySelector('.modal-body');
-    description.textContent = relatedPost.description;
-    const divModal = document.createElement('div');
-    divModal.classList.add('modal-backdrop', 'fade', 'show');
-    elements.body.append(divModal);
-    const closeModalButton = elements.modal.querySelectorAll('[data-bs-dismiss="modal"]');
-    const article = elements.modal.querySelector('.full-article');
+    if (state.uiState.watchedBy === 'BUTTON') {
+      elements.body.classList.add('modal-open');
+      elements.body.setAttribute('style', 'overflow: hidden; padding-right: 17px');
+      elements.modal.classList.add('show');
+      elements.modal.setAttribute('style', 'display: block');
+      elements.modal.removeAttribute('aria-hidden');
+      elements.modal.setAttribute('aria-modal', 'true');
+      const header = elements.modal.querySelector('h5');
+      header.textContent = relatedPost.title;
+      const description = elements.modal.querySelector('.modal-body');
+      description.textContent = relatedPost.description;
+      const divModal = document.createElement('div');
+      divModal.classList.add('modal-backdrop', 'fade', 'show');
+      elements.body.append(divModal);
+      const closeModalButton = elements.modal.querySelectorAll('[data-bs-dismiss="modal"]');
+      const article = elements.modal.querySelector('.full-article');
 
-    article.addEventListener('click', () => {
-      article.setAttribute('href', `${relatedPost.link}`);
-    });
-
-    const closeModal = () => {
-      elements.body.classList.remove('modal-open');
-      elements.body.removeAttribute('style');
-      elements.modal.classList.remove('show');
-      elements.modal.removeAttribute('style');
-      elements.modal.setAttribute('aria-hidden', 'true');
-      elements.modal.removeAttribute('aria-modal');
-      divModal.remove();
-    };
-
-    closeModalButton.forEach((button) => {
-      button.addEventListener('click', () => {
-        closeModal();
+      article.addEventListener('click', () => {
+        article.setAttribute('href', `${relatedPost.link}`);
       });
-    });
-    elements.body.addEventListener('click', (event) => {
-      if (event.target === elements.modal) {
-        closeModal();
-      }
-    });
+
+      const closeModal = () => {
+        elements.body.classList.remove('modal-open');
+        elements.body.removeAttribute('style');
+        elements.modal.classList.remove('show');
+        elements.modal.removeAttribute('style');
+        elements.modal.setAttribute('aria-hidden', 'true');
+        elements.modal.removeAttribute('aria-modal');
+        divModal.remove();
+      };
+
+      closeModalButton.forEach((button) => {
+        button.addEventListener('click', () => {
+          closeModal();
+        });
+      });
+      elements.body.addEventListener('click', (event) => {
+        if (event.target === elements.modal) {
+          closeModal();
+        }
+      });
+    }
   }
 };
 
@@ -188,7 +191,7 @@ const watcher = (state, elements, i18nextInstance) => onChange(state, (path, val
   if (path === 'lng') {
     languageChangeRender(state, elements, i18nextInstance);
   }
-  if (path === 'uiState.selectedPostId') {
+  if (path === 'uiState.watchedBy') {
     showModal(state, elements);
   }
 });
