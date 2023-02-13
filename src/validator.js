@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-import addPostsAndFeeds from './loader.js';
 
 export default (field, state) => {
   yup.setLocale({
@@ -18,13 +17,8 @@ export default (field, state) => {
       .url()
       .notOneOf(state.addedUrls),
   });
-  schema.validate(field, state)
-    .then((data) => {
-      state.currentState = '';
-      addPostsAndFeeds(data.url, state);
-    })
-    .catch((error) => {
-      // state.additionForm.urlIsValid = false;
-      state.currentState = error.message;
-    });
+
+  return schema.validate(field, state)
+    .then((data) => data.url)
+    .catch((error) => error.message);
 };

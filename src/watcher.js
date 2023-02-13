@@ -4,7 +4,8 @@ import _ from 'lodash';
 const possibleErrorMessages = ['parseError', 'networkError', 'invalidUrl', 'existingUrls', 'filledField'];
 
 const renderFeed = (state, elements, i18nextInstance) => {
-  (elements.feeds).innerHTML = '';
+  const { feedsContainer } = elements;
+  feedsContainer.innerHTML = '';
   const div = document.createElement('div');
   div.classList.add('card', 'border-0');
   const cardBody = document.createElement('div');
@@ -32,11 +33,12 @@ const renderFeed = (state, elements, i18nextInstance) => {
     ul.append(li);
   });
   div.append(ul);
-  (elements.feeds).append(div);
+  feedsContainer.append(div);
 };
 
 const renderPosts = (state, elements, i18nextInstance) => {
-  (elements.posts).innerHTML = '';
+  const { postsContainer } = elements.posts;
+  postsContainer.innerHTML = '';
   const div = document.createElement('div');
   div.classList.add('card', 'border-0');
   const divCard = document.createElement('div');
@@ -77,16 +79,33 @@ const renderPosts = (state, elements, i18nextInstance) => {
     ul.append(li);
   });
   div.append(ul);
-  (elements.posts).append(div);
+  postsContainer.append(div);
+};
+
+const translateLanguageButtons = (state, elements) => {
+  const primaryButton = state.lng === 'ru' ? elements.buttonRu : elements.buttonEn;
+  const outlineButton = state.lng === 'ru' ? elements.buttonEn : elements.buttonRu;
+  outlineButton.classList.remove('btn-success');
+  outlineButton.classList.add('btn-outline-success', 'text-dark');
+  primaryButton.classList.remove('btn-outline-success', 'text-dark');
+  primaryButton.classList.add('btn-success');
 };
 
 const translatePageContent = (elements, i18nextInstance) => {
-  elements.mainHeader.textContent = i18nextInstance.t('header');
-  elements.paragraph.textContent = i18nextInstance.t('mainParagraph');
-  elements.addButton.textContent = i18nextInstance.t('addButton');
-  elements.exampleParagraph.textContent = i18nextInstance.t('exampleParagraph');
-  elements.inputLabel.textContent = i18nextInstance.t('inputLabel');
-  elements.footerText.textContent = i18nextInstance.t('footerText');
+  const {
+    mainHeader,
+    paragraph,
+    addButton,
+    exampleParagraph,
+    inputLabel,
+    footerText,
+  } = elements;
+  mainHeader.textContent = i18nextInstance.t('header');
+  paragraph.textContent = i18nextInstance.t('mainParagraph');
+  addButton.textContent = i18nextInstance.t('addButton');
+  exampleParagraph.textContent = i18nextInstance.t('exampleParagraph');
+  inputLabel.textContent = i18nextInstance.t('inputLabel');
+  footerText.textContent = i18nextInstance.t('footerText');
   if (document.querySelector('.feeds-heading')) {
     document.querySelector('.feeds-heading').textContent = i18nextInstance.t('feeds');
     document.querySelector('.posts-heading').textContent = i18nextInstance.t('posts');
@@ -95,17 +114,19 @@ const translatePageContent = (elements, i18nextInstance) => {
 };
 
 const translateOutputMessage = (state, elements, i18nextInstance) => {
+  const { message } = elements;
   if (!state.currentState) {
-    elements.message.textContent = '';
+    message.textContent = '';
   } else if (possibleErrorMessages.includes(state.currentState)) {
-    elements.message.textContent = i18nextInstance.t(`errors.${state.currentState}`);
+    message.textContent = i18nextInstance.t(`errors.${state.currentState}`);
   } else {
-    elements.message.textContent = i18nextInstance.t('RSSLoaded');
+    message.textContent = i18nextInstance.t('RSSLoaded');
   }
 };
 
 const languageChangeRender = (state, elements, i18nextInstance) => {
   translatePageContent(elements, i18nextInstance);
+  translateLanguageButtons(state, elements);
   translateOutputMessage(state, elements, i18nextInstance);
 };
 
@@ -164,28 +185,34 @@ const showModal = (state, elements) => {
 };
 
 const watcher = (state, elements, i18nextInstance) => onChange(state, (path) => {
+  const {
+    input,
+    addButton,
+    message,
+    form,
+  } = elements;
   if (path === 'currentState') {
     if (state.currentState === 'loading') {
-      elements.input.readOnly = true;
-      elements.addButton.disabled = true;
-      elements.message.textContent = '';
+      input.readOnly = true;
+      addButton.disabled = true;
+      message.textContent = '';
     }
     if (state.currentState === 'loaded') {
-      elements.input.readOnly = false;
-      elements.addButton.disabled = false;
-      elements.input.classList.remove('is-invalid');
-      elements.message.textContent = i18nextInstance.t('RSSLoaded');
-      elements.message.classList.remove('text-danger');
-      elements.message.classList.add('text-success');
-      elements.form.reset();
-      elements.form.focus();
+      input.readOnly = false;
+      addButton.disabled = false;
+      input.classList.remove('is-invalid');
+      message.textContent = i18nextInstance.t('RSSLoaded');
+      message.classList.remove('text-danger');
+      message.classList.add('text-success');
+      form.reset();
+      form.focus();
     }
     if (possibleErrorMessages.includes(state.currentState)) {
-      elements.message.textContent = i18nextInstance.t(`errors.${state.currentState}`);
-      elements.message.classList.remove('text-success');
-      elements.message.classList.add('text-danger');
-      elements.input.readOnly = false;
-      elements.addButton.disabled = false;
+      message.textContent = i18nextInstance.t(`errors.${state.currentState}`);
+      message.classList.remove('text-success');
+      message.classList.add('text-danger');
+      input.readOnly = false;
+      addButton.disabled = false;
     }
   }
   if (path === 'posts') {
@@ -195,9 +222,10 @@ const watcher = (state, elements, i18nextInstance) => onChange(state, (path) => 
     renderFeed(state, elements, i18nextInstance);
   }
   if (path === 'lng') {
-    console.log(state);
     languageChangeRender(state, elements, i18nextInstance);
-    renderPosts(state, elements, i18nextInstance);
+    if (state.posts.length > 0) {
+      renderPosts(state, elements, i18nextInstance);
+    }
   }
   if (path === 'uiState.clickedBy') {
     showModal(state, elements);
