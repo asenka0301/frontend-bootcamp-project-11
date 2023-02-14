@@ -65,8 +65,11 @@ export default () => {
           watchedState.currentState = 'loaded';
         })
         .catch((error) => {
-          const typeError = error.message === 'timeout of 5000ms exceeded' ? 'networkError' : error.message;
-          watchedState.currentState = typeError;
+          if ((error.message === 'Network Error') || error.message === ('timeout of 5000ms exceeded')) {
+            watchedState.currentState = 'networkError';
+          } else {
+            watchedState.currentState = error.message;
+          }
         });
     });
 
