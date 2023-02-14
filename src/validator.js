@@ -20,5 +20,7 @@ export default (field, state) => {
 
   return schema.validate(field, state)
     .then((data) => data.url)
-    .catch((error) => error.message);
+    .catch((error) => {
+      throw new Error(error.message);
+    });
 };

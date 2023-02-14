@@ -4,8 +4,8 @@ import _ from 'lodash';
 const possibleErrorMessages = ['parseError', 'networkError', 'invalidUrl', 'existingUrls', 'filledField'];
 
 const renderFeed = (state, elements, i18nextInstance) => {
-  const { feedsContainer } = elements;
-  feedsContainer.innerHTML = '';
+  const { feeds } = elements;
+  feeds.innerHTML = '';
   const div = document.createElement('div');
   div.classList.add('card', 'border-0');
   const cardBody = document.createElement('div');
@@ -33,12 +33,12 @@ const renderFeed = (state, elements, i18nextInstance) => {
     ul.append(li);
   });
   div.append(ul);
-  feedsContainer.append(div);
+  feeds.append(div);
 };
 
 const renderPosts = (state, elements, i18nextInstance) => {
-  const { postsContainer } = elements.posts;
-  postsContainer.innerHTML = '';
+  const { posts } = elements;
+  posts.innerHTML = '';
   const div = document.createElement('div');
   div.classList.add('card', 'border-0');
   const divCard = document.createElement('div');
@@ -79,7 +79,7 @@ const renderPosts = (state, elements, i18nextInstance) => {
     ul.append(li);
   });
   div.append(ul);
-  postsContainer.append(div);
+  posts.append(div);
 };
 
 const translateLanguageButtons = (state, elements) => {
@@ -131,8 +131,13 @@ const languageChangeRender = (state, elements, i18nextInstance) => {
 };
 
 const showModal = (state, elements) => {
+  const {
+    posts,
+    body,
+    modal,
+  } = elements;
   if (state.uiState.clickedBy) {
-    const visitedLink = (elements.posts).querySelector(`a[data-id="${state.uiState.selectedPostId}"]`);
+    const visitedLink = posts.querySelector(`a[data-id="${state.uiState.selectedPostId}"]`);
     const relatedPost = _.find(state.posts, { id: state.uiState.selectedPostId });
     if (state.uiState.selectedPostIds[state.uiState.selectedPostId]) {
       visitedLink.classList.remove('fw-bold');
@@ -140,33 +145,33 @@ const showModal = (state, elements) => {
       visitedLink.classList.add('link-secondary');
     }
     if (state.uiState.clickedBy === 'BUTTON') {
-      elements.body.classList.add('modal-open');
-      elements.body.setAttribute('style', 'overflow: hidden; padding-right: 17px');
-      elements.modal.classList.add('show');
-      elements.modal.setAttribute('style', 'display: block');
-      elements.modal.removeAttribute('aria-hidden');
-      elements.modal.setAttribute('aria-modal', 'true');
-      const header = elements.modal.querySelector('h5');
+      body.classList.add('modal-open');
+      body.setAttribute('style', 'overflow: hidden; padding-right: 17px');
+      modal.classList.add('show');
+      modal.setAttribute('style', 'display: block');
+      modal.removeAttribute('aria-hidden');
+      modal.setAttribute('aria-modal', 'true');
+      const header = modal.querySelector('h5');
       header.textContent = relatedPost.title;
-      const description = elements.modal.querySelector('.modal-body');
+      const description = modal.querySelector('.modal-body');
       description.textContent = relatedPost.description;
       const divModal = document.createElement('div');
       divModal.classList.add('modal-backdrop', 'fade', 'show');
-      elements.body.append(divModal);
-      const closeModalButton = elements.modal.querySelectorAll('[data-bs-dismiss="modal"]');
-      const article = elements.modal.querySelector('.full-article');
+      body.append(divModal);
+      const closeModalButton = modal.querySelectorAll('[data-bs-dismiss="modal"]');
+      const article = modal.querySelector('.full-article');
 
       article.addEventListener('click', () => {
         article.setAttribute('href', `${relatedPost.link}`);
       });
 
       const closeModal = () => {
-        elements.body.classList.remove('modal-open');
-        elements.body.removeAttribute('style');
-        elements.modal.classList.remove('show');
-        elements.modal.removeAttribute('style');
-        elements.modal.setAttribute('aria-hidden', 'true');
-        elements.modal.removeAttribute('aria-modal');
+        body.classList.remove('modal-open');
+        body.removeAttribute('style');
+        modal.classList.remove('show');
+        modal.removeAttribute('style');
+        modal.setAttribute('aria-hidden', 'true');
+        modal.removeAttribute('aria-modal');
         divModal.remove();
       };
 
@@ -175,7 +180,7 @@ const showModal = (state, elements) => {
           closeModal();
         });
       });
-      elements.body.addEventListener('click', (event) => {
+      body.addEventListener('click', (event) => {
         if (event.target === elements.modal) {
           closeModal();
         }

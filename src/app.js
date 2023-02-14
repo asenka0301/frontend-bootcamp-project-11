@@ -1,8 +1,10 @@
 import i18next from 'i18next';
+import _ from 'lodash';
 import validate from './validator.js';
 import watcher from './watcher.js';
 import resources from './locales/index.js';
-import { updatePosts } from './loader.js';
+import loader from './loader.js';
+import parser from './parser.js';
 
 const elements = {
   body: document.querySelector('body'),
@@ -37,7 +39,6 @@ export default () => {
       clickedBy: null,
     },
   };
-
   const i18nextInstance = i18next.createInstance();
 
   i18nextInstance.init({
@@ -51,10 +52,36 @@ export default () => {
       event.preventDefault();
       const formData = new FormData(event.target);
       const url = formData.get('url');
-      validate({ url }, watchedState).then((result) => console.log(result));
+      validate({ url }, watchedState)
+        .then((validationResult) => {
+          watchedState.currentState = 'loading';
+          return loader(validationResult);
+        })
+        .then((response) => {
+          const content = parser(response.data.contents);
+          watchedState.feeds = [content.feed, ...watchedState.feeds];
+          watchedState.posts = [...content.posts, ...watchedState.posts];
+          watchedState.addedUrls = [...watchedState.addedUrls, url];
+          watchedState.currentState = 'loaded';
+        })
+        .catch((error) => {
+          const typeError = error.message === 'timeout of 5000ms exceeded' ? 'networkError' : error.message;
+          watchedState.currentState = typeError;
+        });
     });
 
-    updatePosts(watchedState);
+    const updatePosts = () => {
+      const result = (watchedState.addedUrls)
+        .map((url) => loader(url, watchedState)
+          .then((response) => {
+            const content = parser(response.data.contents);
+            const isTitlesEqual = ((obj1, obj2) => obj1.title === obj2.title);
+            const checkPosts = _.differenceWith(content.posts, watchedState.posts, isTitlesEqual);
+            watchedState.posts = [...checkPosts, ...watchedState.posts];
+          }));
+      Promise.all(result).then(() => setTimeout(() => updatePosts(), 5000));
+    };
+    updatePosts();
 
     elements.langButtons.addEventListener('click', (event) => {
       const buttonId = event.target.getAttribute('id');
